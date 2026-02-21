@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request
 import unicodedata
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
 
 def load_blacklist(path="blacklist.txt"):
     bad_password = set()
@@ -12,7 +15,7 @@ def load_blacklist(path="blacklist.txt"):
                 if password:
                     bad_password.add(password)
     except FileNotFoundError:
-        pass
+        logging.warning(f"Blacklist file not found at {path}.")
     return bad_password
 
 BLACKLIST = load_blacklist()
@@ -81,7 +84,7 @@ def evaluate_password(password: str):
     - +1 if has lowercase
     - +1 if has digit
     - +1 if has symbol
-    Total score: 0 to 5
+    Total score: 0 to 7
     """
 
     if not password:
@@ -161,4 +164,4 @@ def index():
     return render_template("index.html", score=score, category=category, feedback=feedback)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
